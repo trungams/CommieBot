@@ -117,5 +117,4 @@ if __name__ == "__main__":
         except Exception as e:
             print("Failed to load {}\n{}: {}".format(ext, type(e).__name__, e))
 
-#bot.run("NDE5OTE3Njc4NzkxMDk4MzY5.DX_a9g.lDAMkl3demsVcyHFkfQAY6rVymA")
 bot.run(os.environ.get("COMMIE_TOKEN"))

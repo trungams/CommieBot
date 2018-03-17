@@ -1,0 +1,6 @@
+*~
+*.txt
+*.html
+*.sh
+__pycache__
+discord
