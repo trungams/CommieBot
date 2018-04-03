@@ -16,12 +16,13 @@ class Fun():
     @commands.command(pass_context=True)
     @asyncio.coroutine
     def mock(self, ctx, *, msg: str=None):
-        """mOcKinG sPoNGeBOb
+        """
+        mOcKinG sPoNGeBOb
         """
         words = msg.split()
         mix = "".join([(c.upper() if random.randint(0, 1) else c.lower()) for c in msg])
-        yield from self.bot.say(mix)
-        yield from self.bot.delete_message(ctx.message)
+        yield from ctx.send(mix)
+        yield from ctx.message.delete()
 
 def setup(bot):
     bot.add_cog(Fun(bot))
