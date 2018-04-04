@@ -36,19 +36,17 @@ class Database():
     #         return
     #     yield from ctx.send("world!")
     #
+    # @commands.is_owner()
     # @commands.command(pass_context=True)
     # @asyncio.coroutine
     # def testreact(self, ctx):
-    #     msg = yield from ctx.send("top")
+    #     messages = yield from ctx.channel.history(limit=10).flatten()
+    #     # msg = yield from ctx.channel.history(limit=2).next()
+    #     msg = messages[1]
     #     yield from msg.add_reaction("🅱")
     #     yield from msg.add_reaction("◀")
     #     yield from msg.add_reaction("▶")
     #     yield from msg.add_reaction(":thenkeng:420479362488336395")
-    #
-    # @commands.command(pass_context=True)
-    # @asyncio.coroutine
-    # def getemj(self, ctx):
-    #     print(ctx.guild.emojis)
 
 def setup(bot):
     bot.add_cog(Database(bot))
