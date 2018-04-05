@@ -7,7 +7,7 @@ import asyncio
 
 # misc imports
 import os, random, math
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageFilter
 
 class Fun():
     def __init__(self, bot):
@@ -43,7 +43,7 @@ class Fun():
             yield from ctx.send("Image not found :c")
         else:
             fp = "./db/%s"%(att.filename)
-            dest = "./db/tmp%s"%(att.filename[-4:])
+            dest = "./db/%s-deepfried%s"%(att.filename[:-4], att.filename[-4:])
             yield from att.save(fp)
             try:
                 with Image.open(fp) as image:
@@ -51,12 +51,36 @@ class Fun():
                     fried = ImageEnhance.Color(fried).enhance(2.0)
                     fried.save(dest, quality=20)
                     yield from ctx.message.delete()
-                    yield from ctx.send(file=discord.File(fp=dest, filename="deepfried%s"%(att.filename[-4:])))
+                    yield from ctx.send(file=discord.File(fp=dest))
                     os.remove(dest)
             except:
                 yield from ctx.send("Not an image.")
             os.remove(fp)
 
+    @commands.command(pass_context=True)
+    @asyncio.coroutine
+    @commands.is_owner()
+    def blur(self, ctx):
+        """
+        Blur the image
+        """
+        att = yield from self.get_attachment(ctx)
+        if att is None:
+            yield from ctx.send("Image not found :c")
+        else:
+            fp = "./db/%s"%(att.filename)
+            dest = "./db/%s-blurred%s"%(att.filename[:-4], att.filename[-4:])
+            yield from att.save(fp)
+            try:
+                with Image.open(fp) as image:
+                    blurred = image.filter(ImageFilter.BoxBlur(radius=3))
+                    blurred.save(dest)
+                    yield from ctx.message.delete()
+                    yield from ctx.send(file=discord.File(fp=dest))
+                    os.remove(dest)
+            except Exception as e:
+                yield from ctx.send("Not an image.")
+            os.remove(fp)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

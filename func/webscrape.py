@@ -53,7 +53,7 @@ class Webscrape():
     @asyncio.coroutine
     def ipa(self, ctx, *, message: str):
         """
-        return IPA phonetic transcription of message
+        Return IPA phonetic transcription of message
         """
         params = {"output_dialect": "br",
                   "output_style": "only_tr",
@@ -75,7 +75,7 @@ class Webscrape():
         r.close()
 
         transcribed = soup.find(attrs={"id": "transcr_output"}).get_text().replace("+", " ")
-        if "a " in message:
+        if "a " in message: # because of the weird output sometimes
             transcribed = transcribed.replace("eɪ ", "ə ")
         yield from ctx.send(transcribed)
 
