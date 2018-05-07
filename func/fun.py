@@ -1,17 +1,22 @@
 #!/usr/bin/python3
 
+
 # imports for Discord
 import discord
 from discord.ext import commands
 import asyncio
 
+
 # misc imports
 import os, random, math
 from PIL import Image, ImageEnhance, ImageFilter
+import numpy as np
+
 
 class Fun():
     def __init__(self, bot):
         self.bot = bot
+
 
     # borrowed from Marty
     @commands.command(pass_context=True)
@@ -23,6 +28,7 @@ class Fun():
         mix = "".join([(c.upper() if random.randint(0, 1) else c.lower()) for c in message])
         yield from ctx.send(mix)
         yield from ctx.message.delete()
+
 
     @commands.command(pass_context=True, aliases=["aes", "vaporwave", "vapor"])
     @asyncio.coroutine
@@ -39,6 +45,7 @@ class Fun():
         yield from ctx.message.delete()
         yield from ctx.send(aesthetics)
 
+
     @commands.command(pass_context=True)
     @asyncio.coroutine
     def thicc(self, ctx, *, message):
@@ -52,6 +59,7 @@ class Fun():
         yield from ctx.message.delete()
         yield from ctx.send(extra_thicc)
 
+
     def get_attachment(self, ctx: discord.ext.commands.Context):
         messages = yield from ctx.channel.history(limit=50).flatten()
         for msg in messages:
@@ -59,30 +67,46 @@ class Fun():
                 return msg.attachments[0]
         return None
 
-    @commands.command(pass_context=True, aliases=["df", "dfry", "fry"])
-    @asyncio.coroutine
-    def deepfry(self, ctx):
-        """
-        Deep fry the most recent image in the channel
-        """
-        att = yield from self.get_attachment(ctx)
-        if att is None:
-            yield from ctx.send("Image not found :c")
-        else:
-            fp = "./db/%s"%(att.filename)
-            dest = "./db/%s-deepfried%s"%(att.filename[:-4], att.filename[-4:])
-            yield from att.save(fp)
-            try:
-                with Image.open(fp) as image:
-                    fried = ImageEnhance.Contrast(image).enhance(5.0)
-                    fried = ImageEnhance.Color(fried).enhance(2.0)
-                    fried.save(dest, quality=20)
-                    yield from ctx.message.delete()
-                    yield from ctx.send(file=discord.File(fp=dest))
-                    os.remove(dest)
-            except:
-                yield from ctx.send("Not an image.")
-            os.remove(fp)
+
+    def motion_blur(self, image: Image, width, height, radius):
+        arr = np.array(image)
+        output = np.copy(arr)
+        size = 2*radius+1
+
+        for y in range(height):
+            if(arr.shape == 2): # B/W image
+                for i in range(-radius, radius+1):
+                    pixel = arr[y][min(width-1, max(i, 0))]
+
+                for x in range(width):
+                    output[y][x] = pixel/size
+
+                    pixel1 = arr[y][min(x+radius+1, width-1)]
+                    pixel2 = arr[y][max(x-radius, 0)]
+
+                    pixel += pixel1 - pixel2
+            else: # RGB image
+                r = g = b = 0
+                for i in range(-radius, radius+1):
+                    pixel = arr[y][min(width-1, max(i, 0))]
+                    r += int(pixel[0])
+                    g += int(pixel[1])
+                    b += int(pixel[2])  # Red, Green, Blue values
+
+                for x in range(width):
+                    output[y][x][0] = r/size
+                    output[y][x][1] = g/size
+                    output[y][x][2] = b/size
+
+                    pixel1 = arr[y][min(x+radius+1, width-1)]
+                    pixel2 = arr[y][max(x-radius, 0)]
+
+                    r += int(pixel1[0]) - int(pixel2[0])
+                    g += int(pixel1[1]) - int(pixel2[1])
+                    b += int(pixel1[2]) - int(pixel2[2])
+        blurred = Image.fromarray(output.astype('uint8'))
+        return blurred
+
 
     @commands.command(pass_context=True)
     @asyncio.coroutine
@@ -105,8 +129,124 @@ class Fun():
                     yield from ctx.send(file=discord.File(fp=dest))
                     os.remove(dest)
             except Exception as e:
-                yield from ctx.send("Not an image.")
+                yield from ctx.send("Error occurred.")
             os.remove(fp)
+
+
+    @commands.command(pass_context=True)
+    @asyncio.coroutine
+    def hblur(self, ctx):
+        """
+        Motion blur horizontically
+        """
+        att = yield from self.get_attachment(ctx)
+        if att is None:
+            yield from ctx.send("Image not found :c")
+        else:
+            fp = "./db/%s"%(att.filename)
+            dest = "./db/%s-blurred%s"%(att.filename[:-4], att.filename[-4:])
+            yield from att.save(fp)
+            try:
+                with Image.open(fp) as image:
+                    blurred = self.motion_blur(image, image.width, image.height, 15)
+                    blurred.save(dest)
+                    yield from ctx.message.delete()
+                    yield from ctx.send(file=discord.File(fp=dest))
+                    os.remove(dest)
+            except Exception as e:
+                yield from ctx.send("Error occurred.")
+            os.remove(fp)
+
+
+    @commands.command(pass_context=True)
+    @asyncio.coroutine
+    def vblur(self, ctx):
+        """
+        Motion blur vertically
+        """
+        att = yield from self.get_attachment(ctx)
+        if att is None:
+            yield from ctx.send("Image not found :c")
+        else:
+            fp = "./db/%s"%(att.filename)
+            dest = "./db/%s-blurred%s"%(att.filename[:-4], att.filename[-4:])
+            yield from att.save(fp)
+            try:
+                with Image.open(fp) as image:
+                    image = image.transpose(Image.TRANSPOSE)
+                    blurred = self.motion_blur(image, image.width, image.height, 15)
+                    blurred = blurred.transpose(Image.TRANSPOSE)
+                    blurred.save(dest)
+                    yield from ctx.message.delete()
+                    yield from ctx.send(file=discord.File(fp=dest))
+                    os.remove(dest)
+            except Exception as e:
+                yield from ctx.send("Error occurred.")
+            os.remove(fp)
+
+
+    @commands.command(pass_context=True, aliases=["df", "dfry", "fry"])
+    @asyncio.coroutine
+    def deepfry(self, ctx):
+        """
+        Deep fry the most recent image in the channel
+        """
+        att = yield from self.get_attachment(ctx)
+        if att is None:
+            yield from ctx.send("Image not found :c")
+        else:
+            fp = "./db/%s"%(att.filename)
+            dest = "./db/%s-deepfried%s"%(att.filename[:-4], att.filename[-4:])
+            yield from att.save(fp)
+            try:
+                with Image.open(fp) as image:
+                    fried = ImageEnhance.Contrast(image).enhance(1.5)
+                    fried = ImageEnhance.Sharpness(fried).enhance(2.0)
+                    fried = ImageEnhance.Color(fried).enhance(2.0)
+                    fried.save(dest)
+                    yield from ctx.message.delete()
+                    yield from ctx.send(file=discord.File(fp=dest))
+                    os.remove(dest)
+            except Exception:
+                yield from ctx.send("Error occurred.")
+            os.remove(fp)
+
+
+    @commands.command(pass_context=True)
+    @asyncio.coroutine
+    def noise(self, ctx):
+        att = yield from self.get_attachment(ctx)
+        if att is None:
+            yield from ctx.send("Image not found :c")
+        else:
+            fp = "./db/%s"%(att.filename)
+            dest = "./db/%s-deepfried%s"%(att.filename[:-4], att.filename[-4:])
+            yield from att.save(fp)
+            try:
+                with Image.open(fp) as image:
+                    img_arr = np.array(image)
+
+                    width = img_arr.shape[1]
+                    height = img_arr.shape[0]
+
+                    noise = 12 * np.random.randn(height, width)
+                    noisy_image = np.copy(img_arr)
+                    if len(img_arr.shape) == 2: # B/W image
+                        noisy_image = img_arr + noise
+                    else: # RGB image
+                        noisy_image[:,:,0] = img_arr[:,:,0] + noise
+                        noisy_image[:,:,1] = img_arr[:,:,1] + noise
+                        noisy_image[:,:,2] = img_arr[:,:,2] + noise
+
+                    noisy = Image.fromarray(noisy_image.astype('uint8'))
+                    noisy.save(dest)
+                    yield from ctx.message.delete()
+                    yield from ctx.send(file=discord.File(fp=dest))
+                    os.remove(dest)
+            except Exception:
+                yield from ctx.send("Error occurred.")
+            os.remove(fp)
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))

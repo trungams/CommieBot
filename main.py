@@ -6,7 +6,8 @@ Functions: to be updated
 """
 
 #TODO: get lists of user id, channel id, emoji id of a server
-#TODO: react bot, delete message, send random messages, manipulating messages (edting, checking reacts)
+#TODO: react bot, delete message, send random messages
+#TODO: start logging
 
 # imports for Discord
 import discord
@@ -27,10 +28,12 @@ extensions = ["func.webscrape", "func.db", "func.fun"]
 # Define bot
 bot=commands.Bot(command_prefix='>')
 
+
 @bot.event
 @asyncio.coroutine
 def on_ready():
     print("Logged in as {}: {}".format(bot.user.name, bot.user.id))
+
 
 # 4 functions below are borrowed from Marty
 @bot.command(pass_context=True)
@@ -47,6 +50,7 @@ def load(ctx, extension_name: str):
         return
     yield from ctx.send("{} loaded".format(extension_name))
 
+
 @bot.command(pass_context=True)
 @commands.is_owner()
 @asyncio.coroutine
@@ -56,6 +60,7 @@ def unload(ctx, extension_name: str):
     """
     bot.unload_extension(extension_name)
     yield from ctx.send("Unloaded {}.".format(extension_name))
+
 
 @bot.command(pass_context=True)
 @commands.is_owner()
@@ -69,6 +74,7 @@ def reset(ctx):
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
+
 @bot.command(pass_context=True)
 @commands.is_owner()
 @asyncio.coroutine
@@ -78,6 +84,7 @@ def update(ctx):
     """
     yield from ctx.send("Commie is evolving...")
     os.system('git pull')
+
 
 @bot.command(pass_context=True)
 @commands.is_owner()
@@ -90,6 +97,7 @@ def sleep(ctx):
     yield from bot.logout()
     print("Bot shut down.")
 
+
 @bot.command(pass_context=True)
 @asyncio.coroutine
 def woof(ctx):
@@ -97,6 +105,7 @@ def woof(ctx):
     WHO LET THE DOGS OUT???
     """
     yield from ctx.send("WOOF WOOF")
+
 
 @bot.event
 @asyncio.coroutine
@@ -111,6 +120,7 @@ def on_message(message):
         yield from message.channel.send("Thanks!")
     yield from bot.process_commands(message)
 
+
 # Startup extensions
 if __name__ == "__main__":
     for ext in extensions:
@@ -118,5 +128,6 @@ if __name__ == "__main__":
             bot.load_extension(ext)
         except Exception as e:
             print("Failed to load {}\n{}: {}".format(ext, type(e).__name__, e))
+
 
 bot.run(os.environ.get("COMMIE_TOKEN"))
