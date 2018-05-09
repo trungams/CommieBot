@@ -112,8 +112,9 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
+                iterations = max(0, min(int(iterations), 100))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
-                for i in range(int(iterations)):
+                for i in range(iterations):
                     result = cv2.GaussianBlur(result, (5,5), 0)
                 cv2.imwrite(dst, result)
                 yield from ctx.message.delete()
@@ -128,7 +129,7 @@ class Images():
 
     @commands.command(pass_context=True, aliases=['left', 'right'])
     @asyncio.coroutine
-    def hblur(self, ctx, radius='25'):
+    def hblur(self, ctx, radius='10'):
         '''
         Blur the image horizontally
         '''
@@ -141,8 +142,9 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
+                radius = max(0, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
-                result = cv2.blur(result, (int(radius),1))
+                result = cv2.blur(result, (radius,1))
                 cv2.imwrite(dst, result)
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
@@ -151,9 +153,10 @@ class Images():
                 yield from ctx.send('Error occurred.')
             os.remove(src)
 
+
     @commands.command(pass_context=True, aliases=['up', 'down'])
     @asyncio.coroutine
-    def vblur(self, ctx, radius='25'):
+    def vblur(self, ctx, radius='10'):
         '''
         Blur the image vertically
         '''
@@ -166,8 +169,9 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
+                radius = max(0, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
-                result = cv2.blur(result, (1,int(radius)))
+                result = cv2.blur(result, (1,radius))
                 cv2.imwrite(dst, result)
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
@@ -179,7 +183,7 @@ class Images():
 
     @commands.command(pass_context=True, aliases=['zoom', 'radial'])
     @asyncio.coroutine
-    def rblur(self, ctx, radius='25'):
+    def rblur(self, ctx, radius='10'):
         '''
         Radial blur
         '''
@@ -192,10 +196,11 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
+                radius = max(0, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
 
                 result = self.__polar(result)
-                result = cv2.blur(result, (int(radius),1))
+                result = cv2.blur(result, (radius,1))
                 result = self.__cart(result)
 
                 cv2.imwrite(dst, result)
@@ -209,7 +214,7 @@ class Images():
 
     @commands.command(pass_context=True, aliases=['circle', 'circular', 'spin'])
     @asyncio.coroutine
-    def cblur(self, ctx, radius='25'):
+    def cblur(self, ctx, radius='10'):
         '''
         Circular blur
         '''
@@ -222,10 +227,11 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
+                radius = max(0, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
 
                 result = self.__polar(result)
-                result = cv2.blur(result, (1,int(radius)))
+                result = cv2.blur(result, (1,radius))
                 result = self.__cart(result)
 
                 cv2.imwrite(dst, result)
@@ -239,7 +245,7 @@ class Images():
 
     @commands.command(pass_context=True, aliases=['df', 'dfry', 'fry'])
     @asyncio.coroutine
-    def deepfry(self, ctx):
+    def deepfry(self, ctx, iterations='1'):
         '''
         Deep fry an image, mhmm
         '''
@@ -252,20 +258,22 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
+                iterations = max(0, min(int(iterations), 20))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
 
-                std = int(np.std(result))
                 height, width = result.shape[:2]
-                # Contrast
-                result = cv2.addWeighted(result, 0.9, result, 0, std*0.2)
-                # Sharpness
-                kernel = np.array([[0,0,0], [0,1,0], [0,0,0]]) \
-                        + np.array([[0,-1,0], [-1,4,-1], [0,-1,0]]) * 0.3
-                result = cv2.filter2D(result, 0, kernel)
-                # Saturation
-                result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
-                result[:,:,1] = cv2.add(result[:,:,1], result[:,:,1])
-                result = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
+                for i in range(iterations):
+                    std = int(np.std(result))
+                    # Contrast
+                    result = cv2.addWeighted(result, 0.9, result, 0, std*0.25)
+                    # Sharpness
+                    kernel = np.array([[0,0,0], [0,1,0], [0,0,0]]) \
+                            + np.array([[0,-1,0], [-1,4,-1], [0,-1,0]]) * 0.3
+                    result = cv2.filter2D(result, 0, kernel)
+                    # Saturation
+                    result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
+                    result[:,:,1:] = cv2.add(result[:,:,1:], result[:,:,1:])
+                    result = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
 
                 cv2.imwrite(dst, result)
                 yield from ctx.message.delete()
@@ -293,9 +301,10 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
+                iterations = max(0, min(int(iterations), 20))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
 
-                for i in range(int(iterations)-1):
+                for i in range(iterations):
                     noise = np.std(result) * np.random.random(result.shape)
                     result = cv2.add(result, noise.astype('uint8'))
                     result = cv2.addWeighted(result, 1, result, 0, -np.std(result)*0.49)

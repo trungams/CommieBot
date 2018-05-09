@@ -4,3 +4,4 @@
 *.sh
 __pycache__/
 db/
+discord.log
