@@ -142,7 +142,7 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
-                radius = max(0, min(int(radius), 500))
+                radius = max(1, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
                 result = cv2.blur(result, (radius,1))
                 cv2.imwrite(dst, result)
@@ -169,7 +169,7 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
-                radius = max(0, min(int(radius), 500))
+                radius = max(1, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
                 result = cv2.blur(result, (1,radius))
                 cv2.imwrite(dst, result)
@@ -196,7 +196,7 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
-                radius = max(0, min(int(radius), 500))
+                radius = max(1, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
 
                 result = self.__polar(result)
@@ -227,7 +227,7 @@ class Images():
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
-                radius = max(0, min(int(radius), 500))
+                radius = max(1, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
 
                 result = self.__polar(result)
@@ -265,7 +265,7 @@ class Images():
                 for i in range(iterations):
                     std = int(np.std(result))
                     # Contrast
-                    result = cv2.addWeighted(result, 0.9, result, 0, std*0.25)
+                    result = cv2.addWeighted(result, 0.9, result, 0, std*0.3)
                     # Sharpness
                     kernel = np.array([[0,0,0], [0,1,0], [0,0,0]]) \
                             + np.array([[0,-1,0], [-1,4,-1], [0,-1,0]]) * 0.3
