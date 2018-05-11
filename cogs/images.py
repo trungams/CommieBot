@@ -56,13 +56,13 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s' % (att.filename)
-            dst = './db/%s-polar%s' % (att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-polar' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
                 result = self.__polar(result)
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
@@ -82,13 +82,13 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s' % (att.filename)
-            dst = './db/%s-cart%s' % (att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-cart' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
                 result = self.__cart(result)
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
@@ -108,7 +108,7 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s' % (att.filename)
-            dst = './db/%s-blur%s' % (att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-blur' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
@@ -116,7 +116,7 @@ class Images():
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
                 for i in range(iterations):
                     result = cv2.GaussianBlur(result, (5,5), 0)
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
@@ -138,14 +138,14 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s' % (att.filename)
-            dst = './db/%s-hblur%s' % (att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-hblur' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
                 radius = max(1, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
                 result = cv2.blur(result, (radius,1))
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
@@ -165,14 +165,14 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s' % (att.filename)
-            dst = './db/%s-vblur%s' % (att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-vblur' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
                 radius = max(1, min(int(radius), 500))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
                 result = cv2.blur(result, (1,radius))
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
@@ -192,7 +192,7 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s' % (att.filename)
-            dst = './db/%s-rblur%s' % (att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-rblur' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
@@ -203,7 +203,7 @@ class Images():
                 result = cv2.blur(result, (radius,1))
                 result = self.__cart(result)
 
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
@@ -223,7 +223,7 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s' % (att.filename)
-            dst = './db/%s-cblur%s' % (att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-cblur' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
@@ -234,7 +234,7 @@ class Images():
                 result = cv2.blur(result, (1,radius))
                 result = self.__cart(result)
 
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
@@ -254,28 +254,27 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s'%(att.filename)
-            dst = './db/%s-fried%s'%(att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-fried' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
                 iterations = max(0, min(int(iterations), 20))
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
 
-                height, width = result.shape[:2]
+                kernel = np.array([[0,0,0], [0,1,0], [0,0,0]]) \
+                        + np.array([[0,-1,0], [-1,4,-1], [0,-1,0]]) * 0.3
                 for i in range(iterations):
                     std = int(np.std(result))
                     # Contrast
                     result = cv2.addWeighted(result, 0.9, result, 0, std*0.3)
                     # Sharpness
-                    kernel = np.array([[0,0,0], [0,1,0], [0,0,0]]) \
-                            + np.array([[0,-1,0], [-1,4,-1], [0,-1,0]]) * 0.3
                     result = cv2.filter2D(result, 0, kernel)
                     # Saturation
                     result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
                     result[:,:,1:] = cv2.add(result[:,:,1:], result[:,:,1:])
                     result = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
 
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
@@ -297,7 +296,7 @@ class Images():
             yield from ctx.send('Image not found :c')
         else:
             src = './db/%s'%(att.filename)
-            dst = './db/%s-noisy%s'%(att.filename[:-4], att.filename[-4:])
+            dst = './db/%s-noisy' % att.filename[:-4] + '.jpg'
             yield from att.save(src)
             try:
                 yield from ctx.trigger_typing()
@@ -309,7 +308,7 @@ class Images():
                     result = cv2.add(result, noise.astype('uint8'))
                     result = cv2.addWeighted(result, 1, result, 0, -np.std(result)*0.49)
 
-                cv2.imwrite(dst, result)
+                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 20])
                 yield from ctx.message.delete()
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)

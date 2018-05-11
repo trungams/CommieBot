@@ -22,11 +22,11 @@ from datetime import datetime
 
 
 # import extensions
-import func
+import cogs
 import utils
 
 # Define a list of extensions
-extensions = ['func.web', 'func.db', 'func.fun', 'func.images']
+extensions = ['cogs.web', 'cogs.db', 'cogs.fun', 'cogs.images']
 
 # Define bot
 bot=commands.Bot(command_prefix='>')
