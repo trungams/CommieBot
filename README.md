@@ -3,13 +3,13 @@
 Discord bot written in python
 
 ## Requirements:
-   - Python 3.5.2
-   - discord.py
+   - Python 3
+   - discord.py (rewrite version)
    - opencv-python
    - BeautifulSoup
    - numpy
-   - MySQL
+   - sqlite3
    - pillow (outdated)
    - and other miscellaneous Python modules
 
-
+I learned python, basic discord bot structures, and also borrowed some fun commands from Martlet bot from McGill University server! So thanks a ton to the contributors of Marty.

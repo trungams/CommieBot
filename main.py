@@ -19,6 +19,7 @@ import logging
 # misc imports for functions
 import os, sys, math, random
 from datetime import datetime
+import sqlite3
 
 
 # import extensions
@@ -27,9 +28,10 @@ import utils
 
 # Define a list of extensions
 extensions = ['cogs.web', 'cogs.db', 'cogs.fun', 'cogs.images']
+DB_PATH = './db/Commie.db'
 
 # Define bot
-bot=commands.Bot(command_prefix='>')
+bot = commands.Bot(command_prefix='>')
 
 
 logger = logging.getLogger('discord')
@@ -115,22 +117,6 @@ def woof(ctx):
     WHO LET THE DOGS OUT???
     '''
     yield from ctx.send('WOOF WOOF')
-
-
-@bot.event
-@asyncio.coroutine
-def on_message(message):
-    if message.author == bot.user:
-        return
-    if message.content.lower() == 'hi':
-        yield from message.channel.send('Bonjour/Hi')
-    elif message.content == '?':
-        yield from message.channel.send('¿')
-    elif message.content.lower() == 'good boy':
-        yield from message.channel.send('Thanks!')
-    elif 'yee' in message.content:
-        yield from message.channel.send('<:yee:414174675837517825>')
-    yield from bot.process_commands(message)
 
 
 # Startup extensions
