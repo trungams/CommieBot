@@ -17,7 +17,7 @@ class Images():
         self.bot = bot
 
 
-    def __get_attachment(self, ctx: discord.ext.commands.Context):
+    def __getAttachment(self, ctx: discord.ext.commands.Context):
         messages = yield from ctx.channel.history(limit=100).flatten()
         for msg in messages:
             if msg.attachments:
@@ -51,7 +51,7 @@ class Images():
         '''
         Transform Cartesian to polar coordinates
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:
@@ -77,7 +77,7 @@ class Images():
         '''
         Transform from polar to Cartesian coordinates
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:
@@ -103,7 +103,7 @@ class Images():
         '''
         Blur the image
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:
@@ -133,7 +133,7 @@ class Images():
         '''
         Blur the image horizontally
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:
@@ -160,7 +160,7 @@ class Images():
         '''
         Blur the image vertically
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:
@@ -187,7 +187,7 @@ class Images():
         '''
         Radial blur
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:
@@ -218,7 +218,7 @@ class Images():
         '''
         Circular blur
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:
@@ -249,7 +249,7 @@ class Images():
         '''
         Deep fry an image, mhmm
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:
@@ -291,7 +291,7 @@ class Images():
         '''
         Add some noise to tha image!!
         '''
-        att = yield from self.__get_attachment(ctx)
+        att = yield from self.__getAttachment(ctx)
         if att is None:
             yield from ctx.send('Image not found :c')
         else:

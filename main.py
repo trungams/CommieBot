@@ -24,7 +24,6 @@ import sqlite3
 
 # import extensions
 import cogs
-import utils
 
 # Define a list of extensions
 extensions = ['cogs.web', 'cogs.db', 'cogs.fun', 'cogs.images']

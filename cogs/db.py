@@ -9,6 +9,8 @@ import asyncio
 from datetime import datetime
 import random, math
 import sqlite3
+import time
+from .utils.paginator import Pages
 
 DB_PATH = './db/Commie.db'
 
@@ -65,7 +67,7 @@ class Db():
 
     @commands.command(pass_context=True, aliases=['acr', 'addreact'])
     @asyncio.coroutine
-    def add_custom_reaction(self, ctx, trigger: str, response: str):
+    def addCustomReaction(self, ctx, trigger: str, response: str):
         '''
         Add custom response to a specific message
         '''
@@ -79,18 +81,35 @@ class Db():
         yield from ctx.send('Custom reaction created.')
 
 
-    @add_custom_reaction.error
+    @addCustomReaction.error
     @asyncio.coroutine
-    def acr_error(self, ctx, error):
+    def acrError(self, ctx, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
             yield from ctx.send('Trigger or response messages should not be empty.')
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
             yield from ctx.send('Trigger already exists, please delete the current one to add new or use update command.')
 
 
+    @commands.command(pass_context=True, aliases=['lcr', 'listcustomreact'])
+    @asyncio.coroutine
+    def listCustomReaction(self, ctx):
+        '''
+        List all custom reactions of the server
+        '''
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        server_id = c.execute('SELECT id FROM Servers WHERE Server_id = ?', (ctx.guild.id,)).fetchone()[0]
+        c.execute('SELECT Trigger, Response FROM Custom_reactions WHERE Server_id = ?', (server_id,))
+        cr_list = c.fetchall()
+        cr_list = [f'• {cr[0]}: {cr[1]}' for cr in cr_list]
+        if cr_list:
+            p = Pages(ctx, cr_list, content='Custom reaction list')
+            yield from p.paginate()
+
+
     @commands.command(pass_context=True, aliases=['apr', 'addpartreact'])
     @asyncio.coroutine
-    def add_part_reaction(self, ctx, trigger: str, response: str):
+    def addPartReaction(self, ctx, trigger: str, response: str):
         '''
         Custom part reactions. Commie will send a response message if a user's message contains a specific substring. There can only be 10 part reactions per server
         '''
@@ -104,13 +123,30 @@ class Db():
         yield from ctx.send('Part reaction created.')
 
 
-    @add_part_reaction.error
+    @addPartReaction.error
     @asyncio.coroutine
-    def apr_error(self, ctx, error):
+    def aprError(self, ctx, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
             yield from ctx.send('Trigger or response messages should not be empty.')
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
             yield from ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.')
+
+
+    @commands.command(pass_context=True, aliases=['lpr', 'listpartreact'])
+    @asyncio.coroutine
+    def listPartReaction(self, ctx):
+        '''
+        List all custom part reactions of the server
+        '''
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        server_id = c.execute('SELECT id FROM Servers WHERE Server_id = ?', (ctx.guild.id,)).fetchone()[0]
+        c.execute('SELECT Trigger_part, Response FROM Part_reactions WHERE Server_id = ?', (server_id,))
+        cr_list = c.fetchall()
+        cr_list = [f'• {cr[0]}: {cr[1]}' for cr in cr_list]
+        if cr_list:
+            p = Pages(ctx, cr_list, content='Part reaction list')
+            yield from p.paginate()
 
 
     # @commands.command(pass_context=True)
