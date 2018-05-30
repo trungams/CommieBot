@@ -104,7 +104,8 @@ class Db():
         server_id = c.execute('SELECT id FROM Servers WHERE Server_id = ?', (ctx.guild.id,)).fetchone()[0]
         c.execute('SELECT Trigger, Response FROM Custom_reactions WHERE Server_id = ?', (server_id,))
         cr_list = c.fetchall()
-        cr_text = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
+        # cr_text = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
+        cr_text = ['[{}] **{}**\n\t→ {}'.format(i+1, cr[0], cr[1]) for i,cr in zip(range(len(cr_list)),cr_list)]
         if cr_list:
             p = Pages(ctx, itemList=cr_text, content='Custom reaction list')
             yield from p.paginate()
@@ -131,7 +132,8 @@ class Db():
                     c.execute('DELETE FROM Custom_reactions WHERE Server_id = ? AND Trigger = ?', t)
                     conn.commit()
                     del cr_list[index]
-                    p.itemList = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
+                    # p.itemList = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
+                    p.itemList = ['[{}] **{}**\n\t→ {}'.format(i+1, cr[0], cr[1]) for i,cr in zip(range(len(cr_list)),cr_list)]
                     yield from p.paginate()
             yield from ctx.message.delete()
             conn.commit()
@@ -184,7 +186,8 @@ class Db():
         server_id = c.execute('SELECT id FROM Servers WHERE Server_id = ?', (ctx.guild.id,)).fetchone()[0]
         c.execute('SELECT Trigger_part, Response FROM Part_reactions WHERE Server_id = ?', (server_id,))
         pr_list = c.fetchall()
-        pr_text = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
+        # pr_text = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
+        pr_text = ['[{}] **{}**\n\t→ {}'.format(i+1, pr[0], pr[1]) for i,pr in zip(range(len(pr_list)),pr_list)]
         if pr_list:
             p = Pages(ctx, itemList=pr_text, content='Part reaction list')
             yield from p.paginate()
@@ -211,7 +214,8 @@ class Db():
                     c.execute('DELETE FROM Part_reactions WHERE Server_id = ? AND Trigger_part = ?', t)
                     conn.commit()
                     del pr_list[index]
-                    p.itemList = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
+                    # p.itemList = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
+                    p.itemList = ['[{}] **{}**\n\t→ {}'.format(i+1, pr[0], pr[1]) for i,pr in zip(range(len(pr_list)),pr_list)]
                     yield from p.paginate()
             yield from ctx.message.delete()
             conn.commit()

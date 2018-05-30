@@ -3,7 +3,7 @@
 Discord bot written in python
 
 ## Requirements:
-   - Python 3
+   - Python 3.6.5
    - discord.py (rewrite version)
    - opencv-python
    - BeautifulSoup
