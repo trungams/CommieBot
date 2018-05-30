@@ -21,8 +21,8 @@ class Fun():
         mOcKinG sPoNGeBOb
         '''
         mix = ''.join([(c.upper() if random.randint(0, 1) else c.lower()) for c in message])
-        yield from ctx.send(mix)
         yield from ctx.message.delete()
+        yield from ctx.send(mix)
 
 
     @commands.command(pass_context=True, aliases=['aes', 'vaporwave', 'vapor'])

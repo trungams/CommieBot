@@ -93,8 +93,8 @@ def update(ctx):
     '''
     Update bot
     '''
-    yield from ctx.send('Commie is evolving...')
     os.system('git pull')
+    yield from ctx.send('Updated!')
 
 
 @bot.command(pass_context=True)

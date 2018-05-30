@@ -48,6 +48,7 @@ class Web():
         em.set_author(name='Search results from Google for \'%s\':' % query, url=url,
                         icon_url='https://images-ext-1.discordapp.net/external/UsMM0mPPHEKn6WMst8WWG9qMCX_A14JL6Izzr47ucOk/http/i.imgur.com/G46fm8J.png')
         em.set_footer(text=stats)
+        yield from ctx.message.delete()
         yield from ctx.send(embed=em)
 
 

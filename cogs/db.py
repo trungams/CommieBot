@@ -87,9 +87,9 @@ class Db():
     @asyncio.coroutine
     def acrError(self, ctx, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
-            yield from ctx.send('Trigger or response messages should not be empty.')
+            yield from ctx.send('Trigger or response messages should not be empty.', delete_after=60)
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
-            yield from ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.')
+            yield from ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.', delete_after=60)
 
 
     @commands.command(pass_context=True, aliases=['lcr', 'listcustomreact'])
@@ -144,7 +144,7 @@ class Db():
     @asyncio.coroutine
     def lcrError(self, ctx, error):
         if isinstance(error, discord.ext.commands.CommandOnCooldown):
-            yield from ctx.send('Command is on cooldown. Please chill')
+            yield from ctx.send('Command is on cooldown. Please chill', delete_after=90)
 
 
     @commands.command(pass_context=True, aliases=['apr', 'addpartreact'])
@@ -167,9 +167,9 @@ class Db():
     @asyncio.coroutine
     def aprError(self, ctx, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
-            yield from ctx.send('Trigger or response messages should not be empty.')
+            yield from ctx.send('Trigger or response messages should not be empty.', delete_after=60)
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
-            yield from ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.')
+            yield from ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.', delete_after=60)
 
 
     @commands.command(pass_context=True, aliases=['lpr', 'listpartreact'])
@@ -224,7 +224,7 @@ class Db():
     @asyncio.coroutine
     def lprError(self, ctx, error):
         if isinstance(error, discord.ext.commands.CommandOnCooldown):
-            yield from ctx.send('Command is on cooldown. Please chill')
+            yield from ctx.send('Command is on cooldown. Please chill', delete_after=90)
 
 
 def setup(bot):

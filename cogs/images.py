@@ -53,7 +53,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s' % (att.filename)
             dst = './db/%s-polar' % att.filename[:-4] + '.jpg'
@@ -67,7 +67,7 @@ class Images():
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
             os.remove(src)
 
 
@@ -79,7 +79,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s' % (att.filename)
             dst = './db/%s-cart' % att.filename[:-4] + '.jpg'
@@ -93,7 +93,7 @@ class Images():
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
             os.remove(src)
 
 
@@ -105,7 +105,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s' % (att.filename)
             dst = './db/%s-blur' % att.filename[:-4] + '.jpg'
@@ -122,7 +122,7 @@ class Images():
                 os.remove(dst)
             except Exception:
                 # exc_type, exc_value, exc_traceback = sys.exc_info()
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
                 # traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
             os.remove(src)
 
@@ -135,7 +135,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s' % (att.filename)
             dst = './db/%s-hblur' % att.filename[:-4] + '.jpg'
@@ -150,7 +150,7 @@ class Images():
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
             os.remove(src)
 
 
@@ -162,7 +162,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s' % (att.filename)
             dst = './db/%s-vblur' % att.filename[:-4] + '.jpg'
@@ -177,7 +177,7 @@ class Images():
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
             os.remove(src)
 
 
@@ -189,7 +189,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s' % (att.filename)
             dst = './db/%s-rblur' % att.filename[:-4] + '.jpg'
@@ -208,7 +208,7 @@ class Images():
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
             os.remove(src)
 
 
@@ -220,7 +220,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s' % (att.filename)
             dst = './db/%s-cblur' % att.filename[:-4] + '.jpg'
@@ -239,7 +239,7 @@ class Images():
                 yield from ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
             os.remove(src)
 
 
@@ -251,7 +251,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s'%(att.filename)
             dst = './db/%s-fried' % att.filename[:-4] + '.jpg'
@@ -280,7 +280,7 @@ class Images():
                 os.remove(dst)
             except Exception:
                 # exc_type, exc_value, exc_traceback = sys.exc_info()
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
                 # traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
             os.remove(src)
 
@@ -293,7 +293,7 @@ class Images():
         '''
         att = yield from self.__getAttachment(ctx)
         if att is None:
-            yield from ctx.send('Image not found :c')
+            yield from ctx.send('Image not found :c', delete_after=3600)
         else:
             src = './db/%s'%(att.filename)
             dst = './db/%s-noisy' % att.filename[:-4] + '.jpg'
@@ -314,7 +314,7 @@ class Images():
                 os.remove(dst)
             except Exception:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
-                yield from ctx.send('Error occurred.')
+                yield from ctx.send('Error occurred.', delete_after=3600)
                 traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
             os.remove(src)
 
