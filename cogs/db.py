@@ -14,6 +14,8 @@ from .utils.paginator import Pages
 
 DB_PATH = './db/Commie.db'
 
+#TODO: delete custom reactions
+
 class Db():
     def __init__(self, bot):
         self.bot = bot
@@ -69,7 +71,7 @@ class Db():
     @asyncio.coroutine
     def addCustomReaction(self, ctx, trigger: str, response: str):
         '''
-        Add custom response to a specific message
+        Add custom response to a specific message. Limit to 100 custom reactions per server.
         '''
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
@@ -87,10 +89,11 @@ class Db():
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
             yield from ctx.send('Trigger or response messages should not be empty.')
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
-            yield from ctx.send('Trigger already exists, please delete the current one to add new or use update command.')
+            yield from ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.')
 
 
     @commands.command(pass_context=True, aliases=['lcr', 'listcustomreact'])
+    @commands.cooldown(rate=1, per=120)
     @asyncio.coroutine
     def listCustomReaction(self, ctx):
         '''
@@ -101,10 +104,47 @@ class Db():
         server_id = c.execute('SELECT id FROM Servers WHERE Server_id = ?', (ctx.guild.id,)).fetchone()[0]
         c.execute('SELECT Trigger, Response FROM Custom_reactions WHERE Server_id = ?', (server_id,))
         cr_list = c.fetchall()
-        cr_list = [f'• {cr[0]}: {cr[1]}' for cr in cr_list]
+        cr_text = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
         if cr_list:
-            p = Pages(ctx, cr_list, content='Custom reaction list')
+            p = Pages(ctx, itemList=cr_text, content='Custom reaction list')
             yield from p.paginate()
+
+            index = 0
+            def msgCheck(message):
+                try:
+                    if (1 <= int(message.content) <= len(cr_list)) and message.author == p.user:
+                        return True
+                    return False
+                except ValueError:
+                    return False
+
+            while p.delete:
+                yield from ctx.send('Delete option selected. Enter a number to specify which reaction you want to delete.', delete_after=60)
+                try:
+                    message = yield from self.bot.wait_for('message', check=msgCheck, timeout=60)
+                except asyncio.TimeoutError:
+                    yield from ctx.send('Command timeout. You may want to run the command again.', delete_after=60)
+                    break
+                else:
+                    index = int(message.content)-1
+                    t = (server_id, cr_list[index][0], )
+                    c.execute('DELETE FROM Custom_reactions WHERE Server_id = ? AND Trigger = ?', t)
+                    conn.commit()
+                    del cr_list[index]
+                    p.itemList = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
+                    yield from p.paginate()
+            yield from ctx.message.delete()
+            conn.commit()
+            conn.close()
+        else:
+            yield from ctx.send('No part reaction found.', delete_after=60)
+
+
+    @listCustomReaction.error
+    @asyncio.coroutine
+    def lcrError(self, ctx, error):
+        if isinstance(error, discord.ext.commands.CommandOnCooldown):
+            yield from ctx.send('Command is on cooldown. Please chill')
 
 
     @commands.command(pass_context=True, aliases=['apr', 'addpartreact'])
@@ -133,6 +173,7 @@ class Db():
 
 
     @commands.command(pass_context=True, aliases=['lpr', 'listpartreact'])
+    @commands.cooldown(rate=1, per=120)
     @asyncio.coroutine
     def listPartReaction(self, ctx):
         '''
@@ -142,37 +183,48 @@ class Db():
         c = conn.cursor()
         server_id = c.execute('SELECT id FROM Servers WHERE Server_id = ?', (ctx.guild.id,)).fetchone()[0]
         c.execute('SELECT Trigger_part, Response FROM Part_reactions WHERE Server_id = ?', (server_id,))
-        cr_list = c.fetchall()
-        cr_list = [f'• {cr[0]}: {cr[1]}' for cr in cr_list]
-        if cr_list:
-            p = Pages(ctx, cr_list, content='Part reaction list')
+        pr_list = c.fetchall()
+        pr_text = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
+        if pr_list:
+            p = Pages(ctx, itemList=pr_text, content='Part reaction list')
             yield from p.paginate()
 
+            index = 0
+            def msgCheck(message):
+                try:
+                    if (1 <= int(message.content) <= len(pr_list)) and message.author == p.user:
+                        return True
+                    return False
+                except ValueError:
+                    return False
 
-    # @commands.command(pass_context=True)
-    # @asyncio.coroutine
-    # def testmsg(self, ctx):
-    #     yield from ctx.send('Say hello!')
-    #     def check(m):
-    #         return m.content.lower() == 'hello'
-    #     guess = yield from self.bot.wait_for('message', check=check, timeout=5)
-    #     if guess is None:
-    #         yield from ctx.send('oops to slow')
-    #         return
-    #     yield from ctx.send('world!')
+            while p.delete:
+                yield from ctx.send('Delete option selected. Enter a number to specify which reaction you want to delete.', delete_after=60)
+                try:
+                    message = yield from self.bot.wait_for('message', check=msgCheck, timeout=60)
+                except asyncio.TimeoutError:
+                    yield from ctx.send('Command timeout. You may want to run the command again.', delete_after=60)
+                    break
+                else:
+                    index = int(message.content)-1
+                    t = (server_id, pr_list[index][0], )
+                    c.execute('DELETE FROM Part_reactions WHERE Server_id = ? AND Trigger_part = ?', t)
+                    conn.commit()
+                    del pr_list[index]
+                    p.itemList = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
+                    yield from p.paginate()
+            yield from ctx.message.delete()
+            conn.commit()
+            conn.close()
+        else:
+            yield from ctx.send('No part reaction found.', delete_after=60)
 
 
-    # @commands.is_owner()
-    # @commands.command(pass_context=True)
-    # @asyncio.coroutine
-    # def testreact(self, ctx):
-    #     messages = yield from ctx.channel.history(limit=10).flatten()
-    #     # msg = yield from ctx.channel.history(limit=2).next()
-    #     msg = messages[1]
-    #     yield from msg.add_reaction('🅱')
-    #     yield from msg.add_reaction('◀')
-    #     yield from msg.add_reaction('▶')
-    #     yield from msg.add_reaction(':thenkeng:420479362488336395')
+    @listPartReaction.error
+    @asyncio.coroutine
+    def lprError(self, ctx, error):
+        if isinstance(error, discord.ext.commands.CommandOnCooldown):
+            yield from ctx.send('Command is on cooldown. Please chill')
 
 
 def setup(bot):
