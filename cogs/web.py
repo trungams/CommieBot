@@ -15,8 +15,7 @@ class Web():
 
 
     @commands.command(pass_context=True)
-    @asyncio.coroutine
-    def google(self, ctx, *, query: str):
+    async def google(self, ctx, *, query: str):
         '''
         Search and return the first 5 results from Google for query.
         '''
@@ -48,13 +47,12 @@ class Web():
         em.set_author(name='Search results from Google for \'%s\':' % query, url=url,
                         icon_url='https://images-ext-1.discordapp.net/external/UsMM0mPPHEKn6WMst8WWG9qMCX_A14JL6Izzr47ucOk/http/i.imgur.com/G46fm8J.png')
         em.set_footer(text=stats)
-        yield from ctx.message.delete()
-        yield from ctx.send(embed=em)
+        await ctx.message.delete()
+        await ctx.send(embed=em)
 
 
     @commands.command(pass_context=True)
-    @asyncio.coroutine
-    def ipa(self, ctx, *, message: str):
+    async def ipa(self, ctx, *, message: str):
         '''
         Return IPA phonetic transcription of message
         '''
@@ -80,8 +78,8 @@ class Web():
         transcribed = soup.find(attrs={'id': 'transcr_output'}).get_text().replace('+', ' ')
         if 'a ' in message: # because of the weird output sometimes
             transcribed = transcribed.replace('eɪ ', 'ə ')
-        yield from ctx.message.delete()
-        yield from ctx.send(transcribed)
+        await ctx.message.delete()
+        await ctx.send(transcribed)
 
 
 def setup(bot):

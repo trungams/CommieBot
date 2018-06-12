@@ -28,7 +28,7 @@ class Pages():
         self.delete = False
 
 
-    def __showPage(self, page):
+    async def __showPage(self, page):
         self.currentPage = page
         self.embed.title = 'Server: {}'.format(self.guild.name)
         self.embed.colour = 0xff0000
@@ -40,44 +40,44 @@ class Pages():
         if self.message:
             if self.currentPage == 0:
                 try:
-                    yield from self.message.delete()
+                    await self.message.delete()
                     self.message = None
                     return
                 except:
                     pass
             else:
-                yield from self.message.edit(embed=self.embed)
+                await self.message.edit(embed=self.embed)
                 return
         else:
-            self.message = yield from self.channel.send(embed=self.embed, delete_after=1800)
+            self.message = await self.channel.send(embed=self.embed, delete_after=1800)
             for (emoji, _) in self.actions:
-                yield from self.message.add_reaction(emoji)
+                await self.message.add_reaction(emoji)
             return
 
 
-    def __firstPage(self):
-        yield from self.__showPage(1)
+    async def __firstPage(self):
+        await self.__showPage(1)
 
 
-    def __prevPage(self):
-        yield from self.__showPage(max(1, self.currentPage - 1))
+    async def __prevPage(self):
+        await self.__showPage(max(1, self.currentPage - 1))
 
 
-    def __nextPage(self):
-        yield from self.__showPage(min(self.lastPage, self.currentPage + 1))
+    async def __nextPage(self):
+        await self.__showPage(min(self.lastPage, self.currentPage + 1))
 
 
-    def __lastPage(self):
-        yield from self.__showPage(self.lastPage)
+    async def __lastPage(self):
+        await self.__showPage(self.lastPage)
 
 
-    def __halt(self):
-        yield from self.__showPage(0)
+    async def __halt(self):
+        await self.__showPage(0)
 
 
-    def __del(self):
+    async def __del(self):
         self.delete = True
-        yield from self.__showPage(1)
+        await self.__showPage(1)
 
 
     def __reactCheck(self, reaction, user):
@@ -93,12 +93,12 @@ class Pages():
         return False
 
 
-    def paginate(self):
+    async def paginate(self):
         self.delete = False
-        yield from self.__showPage(self.currentPage)
+        await self.__showPage(self.currentPage)
         while not self.delete and self.message:
             try:
-                reaction, user = yield from self.bot.wait_for('reaction_add', check=self.__reactCheck)
+                reaction, user = await self.bot.wait_for('reaction_add', check=self.__reactCheck)
             except:
                 try:
                     self.message.delete()
@@ -106,8 +106,8 @@ class Pages():
                     pass
                 finally:
                     break
-            yield from self.__turnPage()
+            await self.__turnPage()
             try:
-                yield from self.message.remove_reaction(reaction, user)
+                await self.message.remove_reaction(reaction, user)
             except:
                 pass

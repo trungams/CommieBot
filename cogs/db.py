@@ -22,18 +22,16 @@ class Db():
 
 
     @commands.command(pass_context=True)
-    @asyncio.coroutine
-    def communism(self, ctx):
+    async def communism(self, ctx):
         '''
         Send a random commie pic
         '''
         f = open('./db/CommPics.txt')
         piclist = f.read().splitlines()
-        yield from ctx.send(random.choice(piclist))
+        await ctx.send(random.choice(piclist))
 
 
-    @asyncio.coroutine
-    def on_guild_join(self, guild):
+    async def on_guild_join(self, guild):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         t = (guild.id, guild.name,)
@@ -42,8 +40,7 @@ class Db():
         conn.close()
 
 
-    @asyncio.coroutine
-    def on_message(self, message):
+    async def on_message(self, message):
         if message.author == self.bot.user:
             return
         conn = sqlite3.connect(DB_PATH)
@@ -63,13 +60,12 @@ class Db():
                     response = c.fetchone()
                     break
         if response:
-            yield from message.channel.send(response[0])
+            await message.channel.send(response[0])
         conn.close()
 
 
     @commands.command(pass_context=True, aliases=['acr', 'addreact'])
-    @asyncio.coroutine
-    def addCustomReaction(self, ctx, trigger: str, response: str):
+    async def addCustomReaction(self, ctx, trigger: str, response: str):
         '''
         Add custom response to a specific message. Limit to 100 custom reactions per server.
         '''
@@ -80,22 +76,20 @@ class Db():
         c.execute('INSERT INTO Custom_reactions VALUES (?,?,?)', t)
         conn.commit()
         conn.close()
-        yield from ctx.send('Custom reaction created.')
+        await ctx.send('Custom reaction created.')
 
 
     @addCustomReaction.error
-    @asyncio.coroutine
-    def acrError(self, ctx, error):
+    async def acrError(self, ctx, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
-            yield from ctx.send('Trigger or response messages should not be empty.', delete_after=60)
+            await ctx.send('Trigger or response messages should not be empty.', delete_after=60)
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
-            yield from ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.', delete_after=60)
+            await ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.', delete_after=60)
 
 
     @commands.command(pass_context=True, aliases=['lcr', 'listcustomreact'])
     @commands.cooldown(rate=1, per=120)
-    @asyncio.coroutine
-    def listCustomReaction(self, ctx):
+    async def listCustomReaction(self, ctx):
         '''
         List all custom reactions of the server
         '''
@@ -108,10 +102,10 @@ class Db():
             # cr_text = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
             cr_text = ['[{}] **{}**\n\t→ {}'.format(i+1, cr[0], cr[1]) for i,cr in zip(range(len(cr_list)),cr_list)]
             p = Pages(ctx, itemList=cr_text, content='Custom reaction list')
-            yield from p.paginate()
+            await p.paginate()
 
             index = 0
-            def msgCheck(message):
+            async def msgCheck(message):
                 try:
                     if (1 <= int(message.content) <= len(cr_list)) and message.author == p.user:
                         return True
@@ -120,11 +114,11 @@ class Db():
                     return False
 
             while p.delete:
-                yield from ctx.send('Delete option selected. Enter a number to specify which reaction you want to delete.', delete_after=60)
+                await ctx.send('Delete option selected. Enter a number to specify which reaction you want to delete.', delete_after=60)
                 try:
-                    message = yield from self.bot.wait_for('message', check=msgCheck, timeout=60)
+                    message = await self.bot.wait_for('message', check=msgCheck, timeout=60)
                 except asyncio.TimeoutError:
-                    yield from ctx.send('Command timeout. You may want to run the command again.', delete_after=60)
+                    await ctx.send('Command timeout. You may want to run the command again.', delete_after=60)
                     break
                 else:
                     index = int(message.content)-1
@@ -132,28 +126,26 @@ class Db():
                     c.execute('DELETE FROM Custom_reactions WHERE Server_id = ? AND Trigger = ?', t)
                     conn.commit()
                     del cr_list[index]
-                    yield from ctx.send('Custom reaction deleted.')
-                    yield from message.delete()
+                    await ctx.send('Custom reaction deleted.')
+                    await message.delete()
                     # p.itemList = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
                     p.itemList = ['[{}] **{}**\n\t→ {}'.format(i+1, cr[0], cr[1]) for i,cr in zip(range(len(cr_list)),cr_list)]
-                    yield from p.paginate()
-            yield from ctx.message.delete()
+                    await p.paginate()
+            await ctx.message.delete()
             conn.commit()
             conn.close()
         else:
-            yield from ctx.send('No part reaction found.', delete_after=60)
+            await ctx.send('No part reaction found.', delete_after=60)
 
 
     @listCustomReaction.error
-    @asyncio.coroutine
-    def lcrError(self, ctx, error):
+    async def lcrError(self, ctx, error):
         if isinstance(error, discord.ext.commands.CommandOnCooldown):
-            yield from ctx.send('Command is on cooldown. Please chill', delete_after=90)
+            await ctx.send('Command is on cooldown. Please chill', delete_after=90)
 
 
     @commands.command(pass_context=True, aliases=['apr', 'addpartreact'])
-    @asyncio.coroutine
-    def addPartReaction(self, ctx, trigger: str, response: str):
+    async def addPartReaction(self, ctx, trigger: str, response: str):
         '''
         Custom part reactions. Commie will send a response message if a user's message contains a specific substring. There can only be 10 part reactions per server
         '''
@@ -164,22 +156,20 @@ class Db():
         c.execute('INSERT INTO Part_reactions VALUES (?,?,?)', t)
         conn.commit()
         conn.close()
-        yield from ctx.send('Part reaction created.')
+        await ctx.send('Part reaction created.')
 
 
     @addPartReaction.error
-    @asyncio.coroutine
-    def aprError(self, ctx, error):
+    async def aprError(self, ctx, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
-            yield from ctx.send('Trigger or response messages should not be empty.', delete_after=60)
+            await ctx.send('Trigger or response messages should not be empty.', delete_after=60)
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
-            yield from ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.', delete_after=60)
+            await ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.', delete_after=60)
 
 
     @commands.command(pass_context=True, aliases=['lpr', 'listpartreact'])
     @commands.cooldown(rate=1, per=120)
-    @asyncio.coroutine
-    def listPartReaction(self, ctx):
+    async def listPartReaction(self, ctx):
         '''
         List all custom part reactions of the server
         '''
@@ -192,10 +182,10 @@ class Db():
             # pr_text = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
             pr_text = ['[{}] **{}**\n\t→ {}'.format(i+1, pr[0], pr[1]) for i,pr in zip(range(len(pr_list)),pr_list)]
             p = Pages(ctx, itemList=pr_text, content='Part reaction list')
-            yield from p.paginate()
+            await p.paginate()
 
             index = 0
-            def msgCheck(message):
+            async def msgCheck(message):
                 try:
                     if (1 <= int(message.content) <= len(pr_list)) and message.author == p.user:
                         return True
@@ -204,11 +194,11 @@ class Db():
                     return False
 
             while p.delete:
-                yield from ctx.send('Delete option selected. Enter a number to specify which reaction you want to delete.', delete_after=60)
+                await ctx.send('Delete option selected. Enter a number to specify which reaction you want to delete.', delete_after=60)
                 try:
-                    message = yield from self.bot.wait_for('message', check=msgCheck, timeout=60)
+                    message = await self.bot.wait_for('message', check=msgCheck, timeout=60)
                 except asyncio.TimeoutError:
-                    yield from ctx.send('Command timeout. You may want to run the command again.', delete_after=60)
+                    await ctx.send('Command timeout. You may want to run the command again.', delete_after=60)
                     break
                 else:
                     index = int(message.content)-1
@@ -216,28 +206,26 @@ class Db():
                     c.execute('DELETE FROM Part_reactions WHERE Server_id = ? AND Trigger_part = ?', t)
                     conn.commit()
                     del pr_list[index]
-                    yield from ctx.send('Part reaction deleted.')
-                    yield from message.delete()
+                    await ctx.send('Part reaction deleted.')
+                    await message.delete()
                     # p.itemList = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
                     p.itemList = ['[{}] **{}**\n\t→ {}'.format(i+1, pr[0], pr[1]) for i,pr in zip(range(len(pr_list)),pr_list)]
-                    yield from p.paginate()
-            yield from ctx.message.delete()
+                    await p.paginate()
+            await ctx.message.delete()
             conn.commit()
             conn.close()
         else:
-            yield from ctx.send('No part reaction found.', delete_after=60)
+            await ctx.send('No part reaction found.', delete_after=60)
 
 
     @listPartReaction.error
-    @asyncio.coroutine
-    def lprError(self, ctx, error):
+    async def lprError(self, ctx, error):
         if isinstance(error, discord.ext.commands.CommandOnCooldown):
-            yield from ctx.send('Command is on cooldown. Please chill', delete_after=90)
+            await ctx.send('Command is on cooldown. Please chill', delete_after=90)
 
 
     @commands.command(pass_context=True, aliases=['addq'])
-    @asyncio.coroutine
-    def addQuote(self, ctx, author: discord.User, *, quote):
+    async def addQuote(self, ctx, author: discord.User, *, quote):
         '''
         Another way to pin messages
         '''
@@ -249,12 +237,11 @@ class Db():
         c.execute('INSERT INTO Quotes VALUES (?,?,?)', t)
         conn.commit()
         conn.close()
-        yield from ctx.send('Quote added.')
+        await ctx.send('Quote added.')
 
 
     @commands.command(pass_context=True, aliases=['q'])
-    @asyncio.coroutine
-    def quote(self, ctx, query_1=None, *, query_2=None):
+    async def quote(self, ctx, query_1=None, *, query_2=None):
         '''
         Shows a random quote (of a user/contains a certain keywords)
         '''
@@ -280,7 +267,7 @@ class Db():
             quotes = c.fetchall()
         if not quotes:
             conn.close()
-            yield from ctx.send('Quote not found.')
+            await ctx.send('Quote not found.')
         else:
             conn.close()
             quote = random.choice(quotes)
@@ -288,12 +275,11 @@ class Db():
             quote = quote[2]
             author = discord.utils.get(ctx.guild.members, id = author_id)
             author_name = author.display_name
-            yield from ctx.send('{} 📣 {}'.format(author_name, quote))
+            await ctx.send('{} 📣 {}'.format(author_name, quote))
 
 
     @commands.command(pass_context=True, aliases=['lq'])
-    @asyncio.coroutine
-    def listQuote(self, ctx, author: discord.User=None):
+    async def listQuote(self, ctx, author: discord.User=None):
         '''
         List quotes
         '''
@@ -308,9 +294,9 @@ class Db():
         if quoteList:
             quoteListText = ['[{}] {}'.format(i+1, quote[2]) for i,quote in zip(range(len(quoteList)),quoteList)]
             p = Pages(ctx, itemList=quoteListText, content='List quotes')
-            yield from p.paginate()
+            await p.paginate()
             index = 0
-            def msgCheck(message):
+            async def msgCheck(message):
                 try:
                     if (1 <= int(message.content) <= len(quoteList)) and message.author.id == author_id:
                         return True
@@ -318,11 +304,11 @@ class Db():
                 except ValueError:
                     return False
             while p.delete:
-                yield from ctx.send('Delete option selected. Enter a number to specify which quote you want to delete', delete_after=60)
+                await ctx.send('Delete option selected. Enter a number to specify which quote you want to delete', delete_after=60)
                 try:
-                    message = yield from self.bot.wait_for('message', check=msgCheck, timeout=60)
+                    message = await self.bot.wait_for('message', check=msgCheck, timeout=60)
                 except asyncio.TimeoutError:
-                    yield from ctx.send('Command timeout. You may want to run the command again.', delete_after=60)
+                    await ctx.send('Command timeout. You may want to run the command again.', delete_after=60)
                     break
                 else:
                     index = int(message.content)-1
@@ -331,14 +317,14 @@ class Db():
                     conn.commit()
                     del quoteList[index]
                     ctx.send('Quote deleted', delete_after=60)
-                    yield from message.delete()
+                    await message.delete()
                     p.itemList = ['[{}] {}'.format(i+1, quote[2]) for i,quote in zip(range(len(quoteList)),quoteList)]
-                    yield from p.paginate()
-            yield from ctx.message.delete()
+                    await p.paginate()
+            await ctx.message.delete()
             conn.commit()
             conn.close()
         else:
-            yield from ctx.send('No quote found.', delete_after=60)
+            await ctx.send('No quote found.', delete_after=60)
 
 
 def setup(bot):

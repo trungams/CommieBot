@@ -41,46 +41,42 @@ logger.addHandler(handler)
 
 
 @bot.event
-@asyncio.coroutine
-def on_ready():
+async def on_ready():
     print('Logged in as {}: {}'.format(bot.user.name, bot.user.id))
 
 
 # 4 functions below are borrowed from Marty
 @bot.command(pass_context=True)
 @commands.is_owner()
-@asyncio.coroutine
-def load(ctx, extension_name: str):
+async def load(ctx, extension_name: str):
     '''
     Load a specific extension.
     '''
     try:
         bot.load_extension(extension_name)
     except (AttributeError, ImportError) as e:
-        yield from ctx.send('```{}: {}\n```'.format(type(e).__name__, str(e)))
+        await ctx.send('```{}: {}\n```'.format(type(e).__name__, str(e)))
         return
-    yield from ctx.send('{} loaded'.format(extension_name))
+    await ctx.send('{} loaded'.format(extension_name))
 
 
 @bot.command(pass_context=True)
 @commands.is_owner()
-@asyncio.coroutine
-def unload(ctx, extension_name: str):
+async def unload(ctx, extension_name: str):
     '''
     Unload a specific extension
     '''
     bot.unload_extension(extension_name)
-    yield from ctx.send('Unloaded {}.'.format(extension_name))
+    await ctx.send('Unloaded {}.'.format(extension_name))
 
 
 @bot.command(pass_context=True)
 @commands.is_owner()
-@asyncio.coroutine
-def reset(ctx):
+async def reset(ctx):
     '''
     Reset bot
     '''
-    yield from ctx.send('wait a sec')
+    await ctx.send('wait a sec')
     print('Resetting...')
     python = sys.executable
     os.execl(python, python, *sys.argv)
@@ -88,34 +84,31 @@ def reset(ctx):
 
 @bot.command(pass_context=True)
 @commands.is_owner()
-@asyncio.coroutine
-def update(ctx):
+async def update(ctx):
     '''
     Update bot
     '''
     os.system('git pull')
-    yield from ctx.send('Updated!')
+    await ctx.send('Updated!')
 
 
 @bot.command(pass_context=True)
 @commands.is_owner()
-@asyncio.coroutine
-def sleep(ctx):
+async def sleep(ctx):
     '''
     It's time to sleep
     '''
-    yield from ctx.send('c ya nerds')
-    yield from bot.logout()
+    await ctx.send('c ya nerds')
+    await bot.logout()
     print('Bot shut down.')
 
 
 @bot.command(pass_context=True)
-@asyncio.coroutine
-def woof(ctx):
+async def woof(ctx):
     '''
     WHO LET THE DOGS OUT???
     '''
-    yield from ctx.send('WOOF WOOF')
+    await ctx.send('WOOF WOOF')
 
 
 # Startup extensions
