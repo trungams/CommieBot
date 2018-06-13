@@ -105,7 +105,7 @@ class Db():
             await p.paginate()
 
             index = 0
-            async def msgCheck(message):
+            def msgCheck(message):
                 try:
                     if (1 <= int(message.content) <= len(cr_list)) and message.author == p.user:
                         return True
@@ -185,7 +185,7 @@ class Db():
             await p.paginate()
 
             index = 0
-            async def msgCheck(message):
+            def msgCheck(message):
                 try:
                     if (1 <= int(message.content) <= len(pr_list)) and message.author == p.user:
                         return True
@@ -248,12 +248,13 @@ class Db():
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         t = None
+        mentions = ctx.message.mentions
         server_id = c.execute('SELECT id FROM Servers WHERE Server_id = ?', (ctx.guild.id,)).fetchone()[0]
         if query_1 is None:
             t = (server_id,)
             quotes = c.execute('SELECT * FROM Quotes WHERE Server_id = ?', t).fetchall()
-        elif isinstance(query_1, discord.User):
-            author_id = query_1.id
+        elif mentions and mentions[0].mention == query_1:
+            author_id = mentions[0].id
             if query_2 is None:
                 t = (server_id, author_id, '%%',)
             else:
@@ -274,7 +275,7 @@ class Db():
             author_id = int(quote[1])
             quote = quote[2]
             author = discord.utils.get(ctx.guild.members, id = author_id)
-            author_name = author.display_name
+            author_name = author.display_name if author else 'LEGACY'
             await ctx.send('{} 📣 {}'.format(author_name, quote))
 
 
@@ -296,7 +297,7 @@ class Db():
             p = Pages(ctx, itemList=quoteListText, content='List quotes')
             await p.paginate()
             index = 0
-            async def msgCheck(message):
+            def msgCheck(message):
                 try:
                     if (1 <= int(message.content) <= len(quoteList)) and message.author.id == author_id:
                         return True
