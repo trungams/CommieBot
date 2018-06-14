@@ -22,11 +22,14 @@ from datetime import datetime
 import sqlite3
 
 
-# import extensions
-import cogs
-
 # Define a list of extensions
-extensions = ['cogs.web', 'cogs.db', 'cogs.fun', 'cogs.images']
+extensions = [
+    'cogs.web',
+    'cogs.customreactions',
+    'cogs.fun',
+    'cogs.images',
+    'cogs.quotes'
+]
 DB_PATH = './db/Commie.db'
 
 # Define bot
@@ -43,6 +46,16 @@ logger.addHandler(handler)
 @bot.event
 async def on_ready():
     print('Logged in as {}: {}'.format(bot.user.name, bot.user.id))
+
+
+@bot.event
+async def on_guild_join():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    t = (guild.id, guild.name,)
+    c.execute('INSERT INTO Servers (Server_id, Server_name) VALUES (?, ?)', t)
+    conn.commit()
+    conn.close()
 
 
 # 4 functions below are borrowed from Marty
