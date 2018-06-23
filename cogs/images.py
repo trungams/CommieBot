@@ -222,10 +222,12 @@ class Images():
             try:
                 await ctx.trigger_typing()
                 radius = max(1, min(int(radius), 500))
+                halfRadius = radius // 2
                 result = cv2.imread(src, cv2.IMREAD_COLOR)
-
                 result = self.__polar(result)
+                result = cv2.copyMakeBorder(result, halfRadius, halfRadius, halfRadius, halfRadius, cv2.BORDER_WRAP)
                 result = cv2.blur(result, (1,radius))
+                result = result[15:-15, 15:-15]
                 result = self.__cart(result)
 
                 cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
