@@ -68,7 +68,7 @@ class Images():
                 await ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                await ctx.send('Error occurred.', delete_after=3600)
+                await ctx.send('Error occurred.', delete_after=60)
             os.remove(src)
 
 
@@ -94,7 +94,7 @@ class Images():
                 await ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                await ctx.send('Error occurred.', delete_after=3600)
+                await ctx.send('Error occurred.', delete_after=60)
             os.remove(src)
 
 
@@ -123,7 +123,7 @@ class Images():
                 os.remove(dst)
             except Exception:
                 # exc_type, exc_value, exc_traceback = sys.exc_info()
-                await ctx.send('Error occurred.', delete_after=3600)
+                await ctx.send('Error occurred.', delete_after=60)
                 # traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
             os.remove(src)
 
@@ -151,7 +151,7 @@ class Images():
                 await ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                await ctx.send('Error occurred.', delete_after=3600)
+                await ctx.send('Error occurred.', delete_after=60)
             os.remove(src)
 
 
@@ -178,7 +178,7 @@ class Images():
                 await ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                await ctx.send('Error occurred.', delete_after=3600)
+                await ctx.send('Error occurred.', delete_after=60)
             os.remove(src)
 
 
@@ -209,7 +209,7 @@ class Images():
                 await ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                await ctx.send('Error occurred.', delete_after=3600)
+                await ctx.send('Error occurred.', delete_after=60)
             os.remove(src)
 
 
@@ -231,18 +231,28 @@ class Images():
                 radius = max(1, min(int(radius), 500))
                 halfRadius = radius // 2
                 result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+                # determine values for padding
+                height, width = result.shape[:2]
+                r = math.sqrt(width**2 + height**2)//2
+                verticalPad = int(r - height / 2)
+                horizontalPad = int(r - width / 2)
+                # pad border to avoid black regions when transforming image back to normal
+                result = cv2.copyMakeBorder(result, verticalPad, verticalPad, horizontalPad, horizontalPad, cv2.BORDER_REPLICATE)
                 result = self.__polar(result)
+                # wrap border to avoid the sharp horizontal line when transforming image back to normal
                 result = cv2.copyMakeBorder(result, halfRadius, halfRadius, halfRadius, halfRadius, cv2.BORDER_WRAP)
                 result = cv2.blur(result, (1,radius))
                 result = result[halfRadius:-halfRadius, halfRadius:-halfRadius]
                 result = self.__cart(result)
-
+                result = result[verticalPad:-verticalPad, horizontalPad:-horizontalPad]
                 cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
                 await ctx.message.delete()
                 await ctx.send(file=discord.File(fp=dst))
                 os.remove(dst)
             except Exception:
-                await ctx.send('Error occurred.', delete_after=3600)
+                # exc_type, exc_value, exc_traceback = sys.exc_info()
+                await ctx.send('Error occurred.', delete_after=60)
+                # traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
             os.remove(src)
 
 
@@ -283,7 +293,7 @@ class Images():
                 os.remove(dst)
             except Exception:
                 # exc_type, exc_value, exc_traceback = sys.exc_info()
-                await ctx.send('Error occurred.', delete_after=3600)
+                await ctx.send('Error occurred.', delete_after=60)
                 # traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
             os.remove(src)
 
@@ -317,7 +327,7 @@ class Images():
                 os.remove(dst)
             except Exception:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
-                await ctx.send('Error occurred.', delete_after=3600)
+                await ctx.send('Error occurred.', delete_after=60)
                 traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
             os.remove(src)
 
@@ -350,7 +360,7 @@ class Images():
     #             await ctx.send(file=discord.File(buffer, dst))
     #         except Exception:
     #             exc_type, exc_value, exc_traceback = sys.exc_info()
-    #             await ctx.send('Error occurred.', delete_after=3600)
+    #             await ctx.send('Error occurred.', delete_after=60)
     #             traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
 
 
