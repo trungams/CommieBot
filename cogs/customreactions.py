@@ -18,7 +18,7 @@ class Db():
         self.bot = bot
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def communism(self, ctx):
         '''
         Send a random commie pic
@@ -52,7 +52,7 @@ class Db():
         conn.close()
 
 
-    @commands.command(pass_context=True, aliases=['acr', 'addreact'])
+    @commands.command(aliases=['acr', 'addreact'])
     async def addCustomReaction(self, ctx, trigger: str, response: str):
         '''
         Add custom response to a specific message. Limit to 100 custom reactions per server.
@@ -75,7 +75,7 @@ class Db():
             await ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.', delete_after=60)
 
 
-    @commands.command(pass_context=True, aliases=['lcr', 'listcustomreact'])
+    @commands.command(aliases=['lcr', 'listcustomreact'])
     @commands.cooldown(rate=1, per=120)
     async def listCustomReaction(self, ctx):
         '''
@@ -132,7 +132,7 @@ class Db():
             await ctx.send('Command is on cooldown. Please chill', delete_after=90)
 
 
-    @commands.command(pass_context=True, aliases=['apr', 'addpartreact'])
+    @commands.command(aliases=['apr', 'addpartreact'])
     async def addPartReaction(self, ctx, trigger: str, response: str):
         '''
         Custom part reactions. Commie will send a response message if a user's message contains a specific substring. There can only be 10 part reactions per server
@@ -155,7 +155,7 @@ class Db():
             await ctx.send('Reactions limit has been reached, or trigger already exists, please delete the current one to add new or use update command.', delete_after=60)
 
 
-    @commands.command(pass_context=True, aliases=['lpr', 'listpartreact'])
+    @commands.command(aliases=['lpr', 'listpartreact'])
     @commands.cooldown(rate=1, per=120)
     async def listPartReaction(self, ctx):
         '''

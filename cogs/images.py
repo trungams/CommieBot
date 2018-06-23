@@ -46,7 +46,7 @@ class Images():
         return result
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def polar(self, ctx):
         '''
         Transform Cartesian to polar coordinates
@@ -71,7 +71,7 @@ class Images():
             os.remove(src)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def cart(self, ctx):
         '''
         Transform from polar to Cartesian coordinates
@@ -96,7 +96,7 @@ class Images():
             os.remove(src)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def blur(self, ctx, iterations='1'):
         '''
         Blur the image
@@ -125,7 +125,7 @@ class Images():
             os.remove(src)
 
 
-    @commands.command(pass_context=True, aliases=['left', 'right'])
+    @commands.command(aliases=['left', 'right'])
     async def hblur(self, ctx, radius='10'):
         '''
         Blur the image horizontally
@@ -151,7 +151,7 @@ class Images():
             os.remove(src)
 
 
-    @commands.command(pass_context=True, aliases=['up', 'down'])
+    @commands.command(aliases=['up', 'down'])
     async def vblur(self, ctx, radius='10'):
         '''
         Blur the image vertically
@@ -177,7 +177,7 @@ class Images():
             os.remove(src)
 
 
-    @commands.command(pass_context=True, aliases=['zoom', 'radial'])
+    @commands.command(aliases=['zoom', 'radial'])
     async def rblur(self, ctx, radius='10'):
         '''
         Radial blur
@@ -207,7 +207,7 @@ class Images():
             os.remove(src)
 
 
-    @commands.command(pass_context=True, aliases=['circle', 'circular', 'spin'])
+    @commands.command(aliases=['circle', 'circular', 'spin'])
     async def cblur(self, ctx, radius='10'):
         '''
         Circular blur
@@ -237,7 +237,7 @@ class Images():
             os.remove(src)
 
 
-    @commands.command(pass_context=True, aliases=['df', 'dfry', 'fry'])
+    @commands.command(aliases=['df', 'dfry', 'fry'])
     async def deepfry(self, ctx, iterations='1'):
         '''
         Deep fry an image, mhmm
@@ -278,7 +278,7 @@ class Images():
             os.remove(src)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def noise(self, ctx, iterations='1'):
         '''
         Add some noise to tha image!!
@@ -311,7 +311,7 @@ class Images():
             os.remove(src)
 
 
-    # @commands.command(pass_context=True)
+    # @commands.command()
     # async def noise(self, ctx, iterations='1'):
     #     '''
     #     Add some noise to tha image!!

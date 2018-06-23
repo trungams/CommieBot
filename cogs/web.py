@@ -14,7 +14,7 @@ class Web():
         self.bot = bot
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def google(self, ctx, *, query: str):
         '''
         Search and return the first 5 results from Google for query.
@@ -51,7 +51,7 @@ class Web():
         await ctx.send(embed=em)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def ipa(self, ctx, *, message: str):
         '''
         Return IPA phonetic transcription of message

@@ -14,7 +14,7 @@ class Fun():
 
 
     # borrowed from Marty
-    @commands.command(pass_context=True)
+    @commands.command()
     async def mock(self, ctx, *, message: str=None):
         '''
         mOcKinG sPoNGeBOb
@@ -24,7 +24,7 @@ class Fun():
         await ctx.send(mix)
 
 
-    @commands.command(pass_context=True, aliases=['aes', 'vaporwave', 'vapor'])
+    @commands.command(aliases=['aes', 'vaporwave', 'vapor'])
     async def aesthetic(self, ctx, *, message):
         '''
         ａｅｓｔｈｅｔｉｃ
@@ -39,7 +39,7 @@ class Fun():
         await ctx.send(aesthetics)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def thicc(self, ctx, *, message):
         '''
         乇乂丅尺卂 丅卄工匚匚

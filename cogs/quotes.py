@@ -18,7 +18,7 @@ class Quotes():
         self.bot = bot
 
 
-    @commands.command(pass_context=True, aliases=['addq'])
+    @commands.command(aliases=['addq'])
     async def addQuote(self, ctx, author: discord.User, *, quote):
         '''
         Another way to pin messages
@@ -34,7 +34,7 @@ class Quotes():
         await ctx.send('Quote added.')
 
 
-    @commands.command(pass_context=True, aliases=['q'])
+    @commands.command(aliases=['q'])
     async def quote(self, ctx, query_1=None, *, query_2=None):
         '''
         Shows a random quote (of a user/contains a certain keywords)
@@ -73,7 +73,7 @@ class Quotes():
             await ctx.send('{} 📣 {}'.format(author_name, quote))
 
 
-    @commands.command(pass_context=True, aliases=['lq'])
+    @commands.command(aliases=['lq'])
     async def listQuote(self, ctx, author: discord.User=None):
         '''
         List quotes

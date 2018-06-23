@@ -59,7 +59,7 @@ async def on_guild_join():
 
 
 # 4 functions below are borrowed from Marty
-@bot.command(pass_context=True)
+@bot.command()
 @commands.is_owner()
 async def load(ctx, extension_name: str):
     '''
@@ -73,7 +73,7 @@ async def load(ctx, extension_name: str):
     await ctx.send('{} loaded'.format(extension_name))
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.is_owner()
 async def unload(ctx, extension_name: str):
     '''
@@ -83,7 +83,7 @@ async def unload(ctx, extension_name: str):
     await ctx.send('Unloaded {}.'.format(extension_name))
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.is_owner()
 async def reset(ctx):
     '''
@@ -95,7 +95,7 @@ async def reset(ctx):
     os.execl(python, python, *sys.argv)
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.is_owner()
 async def update(ctx):
     '''
@@ -105,7 +105,7 @@ async def update(ctx):
     await ctx.send('Updated!')
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.is_owner()
 async def sleep(ctx):
     '''
@@ -116,7 +116,7 @@ async def sleep(ctx):
     print('Bot shut down.')
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def woof(ctx):
     '''
     WHO LET THE DOGS OUT???
