@@ -33,7 +33,7 @@ class Pages():
         self.embed.title = 'Server: {}'.format(self.guild.name)
         self.embed.colour = 0xff0000
         self.embed.set_author(name=self.content, icon_url='https://cdn.discordapp.com/emojis/417168216994086913.png?v=1')
-        self.embed.set_footer(text='Page {} of {}'.format(page, self.lastPage))
+        self.embed.set_footer(text='Page {} of {} ({} items)'.format(page, self.lastPage, len(itemList)))
         itemIndexStart = self.itemPerPage * (page-1)
         itemIndexEnd = self.itemPerPage * page
         self.embed.description = '\n'.join(self.itemList[itemIndexStart:itemIndexEnd])
