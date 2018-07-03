@@ -12,13 +12,46 @@ import numpy as np
 import cv2
 import math
 import traceback
+from functools import wraps
+
+def filterImage(func):
+    @wraps(func)
+    async def wrapper(self, ctx, *args):
+        att = await Images.getAttachment(ctx)
+        if att is None:
+            await ctx.send('Image not found :c', delete_after=15)
+        else:
+            src = './db/%s' % (att.filename)
+            fn = att.filename.split('.')
+            dst = './db/%s-%s.' % (fn[0], func.__name__) + fn[1]
+            await att.save(src)
+        try:
+            await ctx.trigger_typing()
+            result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+            if len(args) == 2:
+                args = (args[0], result)
+            else:
+                args = (result,)
+            result = await func(self, ctx, *args)
+            cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
+            await ctx.message.delete()
+            await ctx.send(file=discord.File(fp=dst))
+            os.remove(dst)
+        except Exception:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            await ctx.send('Error occurred.', delete_after=60)
+            traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
+        os.remove(src)
+    return wrapper
+
 
 class Images():
     def __init__(self, bot):
         self.bot = bot
 
 
-    async def __getAttachment(self, ctx: discord.ext.commands.Context):
+    @staticmethod
+    async def getAttachment(ctx: discord.ext.commands.Context):
         messages = await ctx.channel.history(limit=100).flatten()
         for msg in messages:
             if msg.attachments:
@@ -47,289 +80,135 @@ class Images():
 
 
     @commands.command()
-    async def polar(self, ctx):
+    @filterImage
+    async def polar(self, ctx, image=None):
         '''
         Transform Cartesian to polar coordinates
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s' % (att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-polar.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-                result = self.__polar(result)
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                await ctx.send('Error occurred.', delete_after=60)
-            os.remove(src)
+        image = self.__polar(image)
+        return image
 
 
     @commands.command()
-    async def cart(self, ctx):
+    @filterImage
+    async def cart(self, ctx, image=None):
         '''
         Transform from polar to Cartesian coordinates
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s' % (att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-cart.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-                result = self.__cart(result)
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                await ctx.send('Error occurred.', delete_after=60)
-            os.remove(src)
+        image = self.__cart(image)
+        return image
 
 
     @commands.command()
-    async def blur(self, ctx, iterations='1'):
+    @filterImage
+    async def blur(self, ctx, iterations='1', image=None):
         '''
         Blur the image
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s' % (att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-blur.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                iterations = max(0, min(int(iterations), 100))
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-                for i in range(iterations):
-                    result = cv2.GaussianBlur(result, (5,5), 0)
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                # exc_type, exc_value, exc_traceback = sys.exc_info()
-                await ctx.send('Error occurred.', delete_after=60)
-                # traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
-            os.remove(src)
+        iterations = max(0, min(int(iterations), 100))
+        for i in range(iterations):
+            image = cv2.GaussianBlur(image, (5,5), 0)
+        return image
 
 
     @commands.command(aliases=['left', 'right'])
-    async def hblur(self, ctx, radius='10'):
+    @filterImage
+    async def hblur(self, ctx, radius='10', image=None):
         '''
         Blur the image horizontally
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s' % (att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-hblur.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                radius = max(1, min(int(radius), 500))
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-                result = cv2.blur(result, (radius,1))
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                await ctx.send('Error occurred.', delete_after=60)
-            os.remove(src)
+        radius = max(1, min(int(radius), 500))
+        image = cv2.blur(image, (radius,1))
+        return image
 
 
     @commands.command(aliases=['up', 'down'])
-    async def vblur(self, ctx, radius='10'):
+    @filterImage
+    async def vblur(self, ctx,radius='10', image=None):
         '''
         Blur the image vertically
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s' % (att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-vblur.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                radius = max(1, min(int(radius), 500))
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-                result = cv2.blur(result, (1,radius))
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                await ctx.send('Error occurred.', delete_after=60)
-            os.remove(src)
+        radius = max(1, min(int(radius), 500))
+        image = cv2.blur(image, (1,radius))
+        return image
 
 
     @commands.command(aliases=['zoom', 'radial'])
-    async def rblur(self, ctx, radius='10'):
+    @filterImage
+    async def rblur(self, ctx, radius='10', image=None):
         '''
         Radial blur
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s' % (att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-rblur.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                radius = max(1, min(int(radius), 500))
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-
-                result = self.__polar(result)
-                result = cv2.blur(result, (radius,1))
-                result = self.__cart(result)
-
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                await ctx.send('Error occurred.', delete_after=60)
-            os.remove(src)
+        radius = max(1, min(int(radius), 500))
+        image = self.__polar(image)
+        image = cv2.blur(image, (radius,1))
+        image = self.__cart(image)
+        return image
 
 
     @commands.command(aliases=['circle', 'circular', 'spin'])
-    async def cblur(self, ctx, radius='10'):
+    @filterImage
+    async def cblur(self, ctx, radius='10', image=None):
         '''
         Circular blur
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s' % (att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-cblur.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                radius = max(1, min(int(radius), 500))
-                halfRadius = radius // 2
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-                # determine values for padding
-                height, width = result.shape[:2]
-                r = math.sqrt(width**2 + height**2)//2
-                verticalPad = int(r - height / 2)
-                horizontalPad = int(r - width / 2)
-                # pad border to avoid black regions when transforming image back to normal
-                result = cv2.copyMakeBorder(result, verticalPad, verticalPad, horizontalPad, horizontalPad, cv2.BORDER_REPLICATE)
-                result = self.__polar(result)
-                # wrap border to avoid the sharp horizontal line when transforming image back to normal
-                result = cv2.copyMakeBorder(result, halfRadius, halfRadius, halfRadius, halfRadius, cv2.BORDER_WRAP)
-                result = cv2.blur(result, (1,radius))
-                result = result[halfRadius:-halfRadius, halfRadius:-halfRadius]
-                result = self.__cart(result)
-                result = result[verticalPad:-verticalPad, horizontalPad:-horizontalPad]
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                # exc_type, exc_value, exc_traceback = sys.exc_info()
-                await ctx.send('Error occurred.', delete_after=60)
-                # traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
-            os.remove(src)
+        radius = max(1, min(int(radius), 500))
+        halfRadius = radius // 2
+        # determine values for padding
+        height, width = image.shape[:2]
+        r = math.sqrt(width**2 + height**2)//2
+        verticalPad = int(r - height / 2)
+        horizontalPad = int(r - width / 2)
+        # pad border to avoid black regions when transforming image back to normal
+        image = cv2.copyMakeBorder(image, verticalPad, verticalPad, horizontalPad, horizontalPad, cv2.BORDER_REPLICATE)
+        image = self.__polar(image)
+        # wrap border to avoid the sharp horizontal line when transforming image back to normal
+        image = cv2.copyMakeBorder(image, halfRadius, halfRadius, halfRadius, halfRadius, cv2.BORDER_WRAP)
+        image = cv2.blur(image, (1,radius))
+        image = image[halfRadius:-halfRadius, halfRadius:-halfRadius]
+        image = self.__cart(image)
+        image = image[verticalPad:-verticalPad, horizontalPad:-horizontalPad]
+
+        return image
 
 
     @commands.command(aliases=['df', 'dfry', 'fry'])
-    async def deepfry(self, ctx, iterations='1'):
+    @filterImage
+    async def deepfry(self, ctx, iterations='1', image=None):
         '''
         Deep fry an image, mhmm
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s'%(att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-fried.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                iterations = max(0, min(int(iterations), 20))
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+        iterations = max(0, min(int(iterations), 20))
+        kernel = np.array([[0,0,0], [0,1,0], [0,0,0]]) \
+                + np.array([[0,-1,0], [-1,4,-1], [0,-1,0]]) * 0.3
+        for i in range(iterations):
+            std = int(np.std(image))
+            # Contrast
+            image = cv2.addWeighted(image, 0.9, image, 0, std*0.3)
+            # Sharpness
+            image = cv2.filter2D(image, 0, kernel)
+            # Saturation
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+            image[:,:,1:] = cv2.add(image[:,:,1:], image[:,:,1:])
+            image = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
 
-                kernel = np.array([[0,0,0], [0,1,0], [0,0,0]]) \
-                        + np.array([[0,-1,0], [-1,4,-1], [0,-1,0]]) * 0.3
-                for i in range(iterations):
-                    std = int(np.std(result))
-                    # Contrast
-                    result = cv2.addWeighted(result, 0.9, result, 0, std*0.3)
-                    # Sharpness
-                    result = cv2.filter2D(result, 0, kernel)
-                    # Saturation
-                    result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
-                    result[:,:,1:] = cv2.add(result[:,:,1:], result[:,:,1:])
-                    result = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
-
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 75])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                # exc_type, exc_value, exc_traceback = sys.exc_info()
-                await ctx.send('Error occurred.', delete_after=60)
-                # traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
-            os.remove(src)
+        return image
 
 
     @commands.command()
-    async def noise(self, ctx, iterations='1'):
+    @filterImage
+    async def noise(self, ctx, iterations='1', image=None):
         '''
         Add some noise to tha image!!
         '''
-        att = await self.__getAttachment(ctx)
-        if att is None:
-            await ctx.send('Image not found :c', delete_after=3600)
-        else:
-            src = './db/%s'%(att.filename)
-            fn = att.filename.split('.')
-            dst = './db/%s-noisy.' % fn[0] + fn[1]
-            await att.save(src)
-            try:
-                await ctx.trigger_typing()
-                iterations = max(0, min(int(iterations), 20))
-                result = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+        iterations = max(0, min(int(iterations), 20))
 
-                for i in range(iterations):
-                    noise = np.std(result) * np.random.random(result.shape)
-                    result = cv2.add(result, noise.astype('uint8'))
-                    result = cv2.addWeighted(result, 1, result, 0, -np.std(result)*0.49)
+        for i in range(iterations):
+            noise = np.std(image) * np.random.random(image.shape)
+            image = cv2.add(image, noise.astype('uint8'))
+            image = cv2.addWeighted(image, 1, image, 0, -np.std(image)*0.49)
 
-                cv2.imwrite(dst, result, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                await ctx.message.delete()
-                await ctx.send(file=discord.File(fp=dst))
-                os.remove(dst)
-            except Exception:
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                await ctx.send('Error occurred.', delete_after=60)
-                traceback.print_exception(exc_type, exc_value, exc_traceback, limit=None, file=sys.stdout)
-            os.remove(src)
+        return image
 
 
     # @commands.command()
@@ -337,7 +216,7 @@ class Images():
     #     '''
     #     Add some noise to tha image!!
     #     '''
-    #     att = await self.__getAttachment(ctx)
+    #     att = await self.getAttachment(ctx)
     #     if att is None:
     #         await ctx.send('Image not found :c', delete_after=3600)
     #     else:
@@ -348,14 +227,14 @@ class Images():
     #         try:
     #             await ctx.trigger_typing()
     #             iterations = max(0, min(int(iterations), 20))
-    #             result = cv2.imdecode(data, cv2.IMREAD_UNCHANGED)
+    #             image = cv2.imdecode(data, cv2.IMREAD_UNCHANGED)
     #
     #             for i in range(iterations):
-    #                 noise = np.std(result) * np.random.random(result.shape)
-    #                 result = cv2.add(result, noise.astype('uint8'))
-    #                 result = cv2.addWeighted(result, 1, result, 0, -np.std(result)*0.49)
+    #                 noise = np.std(image) * np.random.random(image.shape)
+    #                 image = cv2.add(image, noise.astype('uint8'))
+    #                 image = cv2.addWeighted(image, 1, image, 0, -np.std(image)*0.49)
     #
-    #             buffer = BytesIO(cv2.imencode('.jpg', result, [cv2.IMWRITE_JPEG_QUALITY, 100])[1])
+    #             buffer = BytesIO(cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, 100])[1])
     #             await ctx.message.delete()
     #             await ctx.send(file=discord.File(buffer, dst))
     #         except Exception:
