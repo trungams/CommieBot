@@ -88,7 +88,7 @@ class Quotes():
         quoteList = c.fetchall()
         if quoteList:
             quoteListText = ['[{}] {}'.format(i+1, quote[2]) for i,quote in zip(range(len(quoteList)),quoteList)]
-            p = Pages(ctx, itemList=quoteListText, content='List quotes')
+            p = Pages(ctx, itemList=quoteListText, title='List quotes')
             await p.paginate()
             index = 0
             def msgCheck(message):

@@ -28,12 +28,13 @@ extensions = [
     'cogs.customreactions',
     'cogs.fun',
     'cogs.images',
-    'cogs.quotes'
+    'cogs.quotes',
+    'cogs.reminder'
 ]
 DB_PATH = './db/Commie.db'
 
 # Define bot
-bot = commands.Bot(command_prefix='>')
+bot = commands.Bot(command_prefix='!')
 
 
 logger = logging.getLogger('discord')

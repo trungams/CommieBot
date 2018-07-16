@@ -89,7 +89,7 @@ class Db():
         if cr_list:
             # cr_text = [f'[{i+1}] **{cr[0]}**\n\t→ {cr[1]}' for i,cr in zip(range(len(cr_list)),cr_list)]
             cr_text = ['[{}] **{}**\n\t→ {}'.format(i+1, cr[0], cr[1]) for i,cr in zip(range(len(cr_list)),cr_list)]
-            p = Pages(ctx, itemList=cr_text, content='Custom reaction list')
+            p = Pages(ctx, itemList=cr_text, title='Custom reaction list')
             await p.paginate()
 
             index = 0
@@ -169,7 +169,7 @@ class Db():
         if pr_list:
             # pr_text = [f'[{i+1}] **{pr[0]}**\n\t→ {pr[1]}' for i,pr in zip(range(len(pr_list)),pr_list)]
             pr_text = ['[{}] **{}**\n\t→ {}'.format(i+1, pr[0], pr[1]) for i,pr in zip(range(len(pr_list)),pr_list)]
-            p = Pages(ctx, itemList=pr_text, content='Part reaction list')
+            p = Pages(ctx, itemList=pr_text, title='Part reaction list')
             await p.paginate()
 
             index = 0
