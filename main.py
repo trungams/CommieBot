@@ -5,10 +5,6 @@ CommieBot for server Commie Nation Shitpost. Written in Python3
 Functions: to be updated
 '''
 
-#TODO: get lists of user id, channel id, emoji id of a server
-#TODO: react bot, delete message, send random messages
-
-
 # imports for Discord
 import discord
 from discord.ext import commands
@@ -34,7 +30,7 @@ extensions = [
 DB_PATH = './db/Commie.db'
 
 # Define bot
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix=['!', '>'])
 
 
 logger = logging.getLogger('discord')
@@ -47,6 +43,7 @@ logger.addHandler(handler)
 @bot.event
 async def on_ready():
     print('Logged in as {}: {}'.format(bot.user.name, bot.user.id))
+    await bot.change_presence(activity=discord.Game(name='Type !help for a list of commands.'))
 
 
 @bot.event
