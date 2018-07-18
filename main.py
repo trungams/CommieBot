@@ -122,6 +122,17 @@ async def woof(ctx):
     await ctx.send('WOOF WOOF')
 
 
+@bot.command()
+@commands.is_owner()
+async def backup(ctx):
+    '''
+    Send the current database file to the owner
+    '''
+    today = datetime.today()
+    backup_file_name = 'Commie%s.db' % today.strftime('%Y%m%d')
+    await ctx.send(content='Here you go', file=discord.File(fp=DB_PATH, filename=backup_file_name))
+
+
 # Startup extensions
 if __name__ == '__main__':
     for ext in extensions:
