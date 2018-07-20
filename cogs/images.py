@@ -7,12 +7,12 @@ import asyncio
 
 # misc imports
 import os, sys, random
-from io import BytesIO
 import numpy as np
 import cv2
 import math
-import traceback
 from functools import wraps
+# import traceback
+# from io import BytesIO
 
 def filterImage(func):
     @wraps(func)
@@ -65,7 +65,10 @@ class Images():
         centerY = height/2
         radius = math.sqrt(width**2 + height**2)/2
 
-        result = cv2.linearPolar(image, (centerX, centerY), radius, cv2.INTER_LINEAR + cv2.WARP_FILL_OUTLIERS)
+        result = cv2.linearPolar(image,
+            (centerX, centerY),
+            radius,
+            cv2.INTER_LINEAR + cv2.WARP_FILL_OUTLIERS)
         return result
 
 
@@ -75,7 +78,10 @@ class Images():
         centerY = height/2
         radius = math.sqrt(width**2 + height**2)/2
 
-        result = cv2.linearPolar(image, (centerX, centerY), radius, cv2.INTER_LINEAR + cv2.WARP_FILL_OUTLIERS + cv2.WARP_INVERSE_MAP)
+        result = cv2.linearPolar(image,
+            (centerX, centerY),
+            radius,
+            cv2.INTER_LINEAR + cv2.WARP_FILL_OUTLIERS + cv2.WARP_INVERSE_MAP)
         return result
 
 
@@ -86,7 +92,7 @@ class Images():
         Transform Cartesian to polar coordinates
         '''
         image = self.__polar(image)
-        return image
+        return np.rot90(image, -1)
 
 
     @commands.command()
@@ -95,7 +101,7 @@ class Images():
         '''
         Transform from polar to Cartesian coordinates
         '''
-        image = self.__cart(image)
+        image = self.__cart(np.rot90(image))
         return image
 
 
